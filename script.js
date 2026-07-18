@@ -1,40 +1,20 @@
-// Interactive Background Blob
-const blob = document.getElementById("blob");
-document.body.onpointermove = event => {
-    const { clientX, clientY } = event;
-    blob.animate({
-        left: `${clientX}px`,
-        top: `${clientY}px`
-    }, { duration: 3000, fill: "forwards" });
-}
+// Use Intersection Observer to trigger fade-in animations on scroll
+const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.15
+};
 
-// Smooth scrolling for navigation
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        if (targetId !== '#') {
-            document.querySelector(targetId).scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-// Reveal Animation on Scroll
-const revealElements = document.querySelectorAll('.glass, .award-pill, .lead-card');
-const revealObserver = new IntersectionObserver((entries) => {
+const observer = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.style.opacity = "1";
-            entry.target.style.transform = "translateY(0)";
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target); // Only animate once
         }
     });
-}, { threshold: 0.1 });
+}, observerOptions);
 
-revealElements.forEach(el => {
-    el.style.opacity = "0";
-    el.style.transform = "translateY(30px)";
-    el.style.transition = "all 0.8s cubic-bezier(0.23, 1, 0.32, 1)";
-    revealObserver.observe(el);
+// Select all elements with the 'fade-in' class and observe them
+document.querySelectorAll('.fade-in').forEach((element) => {
+    observer.observe(element);
 });
